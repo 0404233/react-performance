@@ -1,22 +1,27 @@
-export function createResource<T>(asyncFn: () => Promise<T>) {
+export function createResource<T>(promiseFactory: () => Promise<T>) {
   let status: 'pending' | 'success' | 'error' = 'pending';
-  let result: T;
+  let result: T | undefined;
   let error: unknown;
-  const suspender = asyncFn()
-    .then((r) => {
+
+  const suspender = promiseFactory()
+    .then((res) => {
       status = 'success';
-      result = r;
+      result = res;
     })
-    .catch((e) => {
+    .catch((err: unknown) => {
       status = 'error';
-      error = e;
+      error = err;
     });
 
   return {
-    read() {
-      if (status === 'pending') throw suspender;
-      if (status === 'error') throw error;
-      return result!;
+    read(): T {
+      if (status === 'pending') {
+        throw suspender;
+      }
+      if (status === 'error') {
+        throw error;
+      }
+      return result as T;
     }
   };
 }

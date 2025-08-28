@@ -1,13 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
-export function useStickyState<T>(key: string, defaultValue: T) {
+export default function useStickyState<T>(defaultValue: T, key: string) {
   const [value, setValue] = useState<T>(() => {
-    const stored = localStorage.getItem(key);
-    return stored ? (JSON.parse(stored) as T) : defaultValue;
+    try {
+      const stickyVal = localStorage.getItem(key);
+      return stickyVal !== null ? JSON.parse(stickyVal) : defaultValue;
+    } catch {
+      return defaultValue;
+    }
   });
 
   useEffect(() => {
-    localStorage.setItem(key, JSON.stringify(value));
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch {}
   }, [key, value]);
 
   return [value, setValue] as const;

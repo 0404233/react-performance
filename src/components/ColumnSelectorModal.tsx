@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { DEFAULT_COLUMNS } from '../utils/dataTransforms';
 
 interface ColumnSelectorModalProps {
-  allColumns: string[];
-  selectedColumns: string[];
+  allColumns: readonly string[];
+  selectedColumns: readonly string[];
   onClose: () => void;
   onApply: (cols: string[]) => void;
 }
@@ -15,15 +15,17 @@ const ColumnSelectorModal: React.FC<ColumnSelectorModalProps> = ({
   allColumns,
   selectedColumns,
   onClose,
-  onApply
+  onApply,
 }) => {
-  const [localCols, setLocalCols] = useState<string[]>([...selectedColumns]);
+  const [localCols, setLocalCols] =
+    useState<readonly string[]>(selectedColumns);
 
-  useEffect(() => {
-    setLocalCols([...selectedColumns]);
-  }, [selectedColumns]);
+  useEffect(() => setLocalCols(selectedColumns), [selectedColumns]);
 
-  const selectable = allColumns.filter((c) => c !== 'year');
+  const selectable = useMemo(
+    () => allColumns.filter((c) => c !== 'year'),
+    [allColumns]
+  );
 
   const toggle = (col: string) => {
     setLocalCols((prev) =>
@@ -52,10 +54,16 @@ const ColumnSelectorModal: React.FC<ColumnSelectorModalProps> = ({
           ))}
         </div>
         <div className="modal-actions">
-          <button className="btn-secondary" onClick={resetDefault}>Сбросить</button>
+          <button className="btn-secondary" onClick={resetDefault}>
+            Сбросить
+          </button>
           <div className="spacer" />
-          <button className="btn" onClick={() => onApply(localCols)}>Применить</button>
-          <button className="btn-outline" onClick={onClose}>Отмена</button>
+          <button className="btn" onClick={() => onApply([...localCols])}>
+            Применить
+          </button>
+          <button className="btn-outline" onClick={onClose}>
+            Отмена
+          </button>
         </div>
       </div>
     </div>,

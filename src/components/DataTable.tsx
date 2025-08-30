@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { type CountryData } from '../types/co2';
 
 interface DataTableProps {
@@ -7,49 +7,48 @@ interface DataTableProps {
   selectedColumns: string[];
 }
 
-const DataTable: React.FC<DataTableProps> = ({
-  country,
-  selectedYear,
-  selectedColumns
-}) => {
+const DataTable: React.FC<DataTableProps> = React.memo(
+  ({ country, selectedYear, selectedColumns }) => {
+    const rows = useMemo(() => {
+      return Array.from(country.byYear.entries())
+        .map(([year, data]) => ({
+          ...data,
+          year,
+        }))
+        .sort((a, b) => a.year - b.year);
+    }, [country]);
 
-  const rows = Array.from(country.byYear.entries())
-    .map(([year, data]) => ({
-      ...data,
-      year,
-    }))
-    .sort((a, b) => a.year - b.year);
-
-  return (
-    <div className="data-table-wrapper">
-      <table className="data-table">
-        <thead>
-          <tr>
-            <th>Год</th>
-            {selectedColumns.map((col) => (
-              <th key={col}>{col}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr
-              key={row.year}
-              className={row.year === selectedYear ? 'highlight-row' : ''}
-            >
-              <td>{row.year}</td>
+    return (
+      <div className="data-table-wrapper">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Год</th>
               {selectedColumns.map((col) => (
-                <td key={col}>
-                  {formatNumber(row[col as keyof typeof row])}
-                </td>
+                <th key={col}>{col}</th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-};
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr
+                key={row.year}
+                className={row.year === selectedYear ? 'highlight-row' : ''}
+              >
+                <td>{row.year}</td>
+                {selectedColumns.map((col) => (
+                  <td key={col}>
+                    {formatNumber(row[col as keyof typeof row])}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  }
+);
 
 function formatNumber(value: unknown) {
   if (value == null || value === 'N/A') return 'N/A';

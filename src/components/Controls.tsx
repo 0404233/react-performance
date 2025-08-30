@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 
 interface ControlsProps {
   years: number[];
@@ -17,97 +17,121 @@ interface ControlsProps {
   onOpenModal: () => void;
 }
 
-const Controls: React.FC<ControlsProps> = ({
-  years,
-  regions,
-  selectedYear,
-  onYearChange,
-  regionFilter,
-  onFilterRegion,
-  searchQuery,
-  onSearch,
-  sortBy,
-  sortOrder,
-  onSortChange,
-  onSortOrderChange,
-  selectedColumns,
-  onOpenModal
-}) => {
-  const yearOptions = years.map((y) => ({ value: y, label: y }));
+const Controls: React.FC<ControlsProps> = React.memo(
+  ({
+    years,
+    regions,
+    selectedYear,
+    onYearChange,
+    regionFilter,
+    onFilterRegion,
+    searchQuery,
+    onSearch,
+    sortBy,
+    sortOrder,
+    onSortChange,
+    onSortOrderChange,
+    selectedColumns,
+    onOpenModal,
+  }) => {
+    const yearOptions = useMemo(
+      () => years.map((y) => ({ value: y, label: y })),
+      [years]
+    );
 
-  const handleYear = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    onYearChange(Number(e.target.value));
-  };
+    const handleYear = useCallback(
+      (e: React.ChangeEvent<HTMLSelectElement>) => {
+        onYearChange(Number(e.target.value));
+      },
+      [onYearChange]
+    );
 
-  const handleRegion = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    onFilterRegion(e.target.value);
-  };
+    const handleRegion = useCallback(
+      (e: React.ChangeEvent<HTMLSelectElement>) => {
+        onFilterRegion(e.target.value);
+      },
+      [onFilterRegion]
+    );
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onSearch(e.target.value);
-  };
+    const handleSearch = useCallback(
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        onSearch(e.target.value);
+      },
+      [onSearch]
+    );
 
-  const handleSortBy = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    onSortChange(e.target.value);
-  };
+    const handleSortBy = useCallback(
+      (e: React.ChangeEvent<HTMLSelectElement>) => {
+        onSortChange(e.target.value);
+      },
+      [onSortChange]
+    );
 
-  const handleSortOrder = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    onSortOrderChange(e.target.value as 'asc' | 'desc');
-  };
+    const handleSortOrder = useCallback(
+      (e: React.ChangeEvent<HTMLSelectElement>) => {
+        onSortOrderChange(e.target.value as 'asc' | 'desc');
+      },
+      [onSortOrderChange]
+    );
 
-  return (
-    <div className="controls">
-      <div className="row">
-        <label className="control">
-          <span>Год</span>
-          <select value={selectedYear} onChange={handleYear}>
-            {yearOptions.map(({ value, label }) => (
-              <option key={value} value={value}>{label}</option>
-            ))}
-          </select>
-        </label>
+    return (
+      <div className="controls">
+        <div className="row">
+          <label className="control">
+            <span>Год</span>
+            <select value={selectedYear} onChange={handleYear}>
+              {yearOptions.map(({ value, label }) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
 
-        <label className="control">
-          <span>Регион</span>
-          <select value={regionFilter} onChange={handleRegion}>
-            {regions.map((r) => (
-              <option key={r} value={r}>{r}</option>
-            ))}
-          </select>
-        </label>
+          <label className="control">
+            <span>Регион</span>
+            <select value={regionFilter} onChange={handleRegion}>
+              {regions.map((r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
+              ))}
+            </select>
+          </label>
 
-        <label className="control control-wide">
-          <span>Поиск</span>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={handleSearch}
-            placeholder="Например: Russia"
-          />
-        </label>
+          <label className="control control-wide">
+            <span>Поиск</span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={handleSearch}
+              placeholder="Например: Russia"
+            />
+          </label>
 
-        <label className="control">
-          <span>Сортировать по</span>
-          <select value={sortBy} onChange={handleSortBy}>
-            <option value="population">Население</option>
-            <option value="name">Название</option>
-          </select>
-        </label>
+          <label className="control">
+            <span>Сортировать по</span>
+            <select value={sortBy} onChange={handleSortBy}>
+              <option value="population">Население</option>
+              <option value="name">Название</option>
+            </select>
+          </label>
 
-        <label className="control">
-          <span>Порядок</span>
-          <select value={sortOrder} onChange={handleSortOrder}>
-            <option value="asc">По возрастанию</option>
-            <option value="desc">По убыванию</option>
-          </select>
-        </label>
+          <label className="control">
+            <span>Порядок</span>
+            <select value={sortOrder} onChange={handleSortOrder}>
+              <option value="asc">По возрастанию</option>
+              <option value="desc">По убыванию</option>
+            </select>
+          </label>
 
-        <button className="btn" onClick={onOpenModal}>
-          Выбрать колонки ({selectedColumns.length})
-        </button>
+          <button className="btn" onClick={onOpenModal}>
+            Выбрать колонки ({selectedColumns.length})
+          </button>
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  }
+);
 
 export default Controls;

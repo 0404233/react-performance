@@ -3,7 +3,7 @@ import { normalizeCo2Dataset } from '../utils/dataTransforms';
 import { type NormalizedData } from '../types/co2';
 
 const DATA_URL =
-  '/react-perfomance/owid-co2-data.json';
+  '/react-performance/owid-co2-data.json';
 
 async function fetchCo2(): Promise<NormalizedData> {
   const res = await fetch(DATA_URL, { cache: 'no-store' });

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { type CountryData } from '../types/co2';
-import DataTable from './DataTable';
+import DataTableModal from './DataTable';
 import { getValueForYear } from '../utils/dataTransforms';
 
 interface CountryCardProps {
@@ -11,7 +11,7 @@ interface CountryCardProps {
 
 const CountryCard: React.FC<CountryCardProps> = React.memo(
   ({ country, selectedYear, selectedColumns }) => {
-    const [expanded, setExpanded] = useState(false);
+    const [showTable, setShowTable] = useState(false);
     const [highlight, setHighlight] = useState(false);
 
     const latestPopulation = useMemo(() => {
@@ -53,17 +53,18 @@ const CountryCard: React.FC<CountryCardProps> = React.memo(
 
           <button
             className="btn-outline"
-            onClick={() => setExpanded((e) => !e)}
+            onClick={() => setShowTable((e) => !e)}
           >
-            {expanded ? 'Скрыть таблицу' : 'Показать таблицу'}
+            {showTable ? 'Скрыть таблицу' : 'Показать таблицу'}
           </button>
         </div>
 
-        {expanded && (
-          <DataTable
+        {showTable && (
+          <DataTableModal
             country={country}
             selectedYear={selectedYear}
             selectedColumns={selectedColumns}
+            onClose={() => setShowTable(false)}
           />
         )}
       </div>

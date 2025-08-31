@@ -12,7 +12,7 @@ function AppContent() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('co2');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const [selectedColumns, setSelectedColumns] = useState<string[]>([
+  const [selectedColumns] = useState<string[]>([
     'co2',
     'population',
     'co2_per_capita',
